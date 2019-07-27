@@ -1,0 +1,176 @@
+CREATE TABLE public.centers
+(
+    centerid integer NOT NULL,
+    schoolid integer NOT NULL,
+	capacity long;
+    CONSTRAINT centers_pkey PRIMARY KEY (centerid),
+    CONSTRAINT centers_schoolid_fkey FOREIGN KEY (schoolid)
+        REFERENCES public.school (schoolid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.conducts
+(
+    centerid integer,
+    examid integer,
+    CONSTRAINT conducts_centerid_fkey FOREIGN KEY (centerid)
+        REFERENCES public.centers (centerid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT conducts_examid_fkey FOREIGN KEY (examid)
+        REFERENCES public.exam (examid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.exam
+(
+    examid integer NOT NULL,
+    date date,
+    "time" time without time zone,
+    subjectid integer,
+    exam_type character varying(10) COLLATE pg_catalog."default",
+    CONSTRAINT exam_pkey PRIMARY KEY (examid)
+);
+
+CREATE TABLE public.examinar
+(
+    e_id integer NOT NULL,
+    fname character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    mname character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    lname character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    phone character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    qualification character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    gender character varying(1) COLLATE pg_catalog."default" NOT NULL,
+    stream integer NOT NULL,
+    ischecker boolean NOT NULL,
+    issupervisor boolean NOT NULL,
+    issetter boolean NOT NULL,
+    center integer,
+    examid integer,
+    CONSTRAINT examinar_pkey PRIMARY KEY (e_id),
+    CONSTRAINT examinar_center_fkey FOREIGN KEY (center)
+        REFERENCES public.centers (centerid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT examinar_examid_fkey FOREIGN KEY (examid)
+        REFERENCES public.exam (examid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.gives
+(
+    student integer,
+    exam integer,
+    CONSTRAINT gives_exam_fkey FOREIGN KEY (exam)
+        REFERENCES public.exam (examid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT gives_student_fkey FOREIGN KEY (student)
+        REFERENCES public.student (enrollment_number) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.result
+(
+    result_id integer NOT NULL,
+    studentid integer NOT NULL,
+    persentage integer,
+    is_pass boolean NOT NULL,
+    CONSTRAINT result_pkey PRIMARY KEY (result_id),
+    CONSTRAINT result_studentid_fkey FOREIGN KEY (studentid)
+        REFERENCES public.student (enrollment_number) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.school
+(
+    schoolid integer NOT NULL,
+    schoolname character varying(30) COLLATE pg_catalog."default",
+    city character varying(30) COLLATE pg_catalog."default",
+    state character varying(30) COLLATE pg_catalog."default",
+    pincode integer,
+    CONSTRAINT school_pkey PRIMARY KEY (schoolid)
+);
+
+CREATE TABLE public.school_representative
+(
+    srid integer,
+    schoolid integer NOT NULL,
+    address character varying(50) COLLATE pg_catalog."default",
+    phone integer,
+    email character varying(50) COLLATE pg_catalog."default",
+    pincode integer,
+    fname character varying(30) COLLATE pg_catalog."default",
+    mname character varying(30) COLLATE pg_catalog."default",
+    lname character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT school_representative_schoolid_key UNIQUE (schoolid)
+,
+    CONSTRAINT school_representative_schoolid_fkey FOREIGN KEY (schoolid)
+        REFERENCES public.school (schoolid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE public.stream
+(
+    sid integer NOT NULL,
+    stream_name character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT stream_pkey PRIMARY KEY (sid)
+);
+
+CREATE TABLE public.student
+(
+    enrollment_number integer NOT NULL,
+    firstname character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    middlename character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    lastname character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    fathername character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    aadharnumber bigint NOT NULL,
+    mobilenumber bigint NOT NULL,
+    date_of_birth date NOT NULL,
+    al character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    city character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    state character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    pincode integer NOT NULL,
+    gender character varying(1) COLLATE pg_catalog."default" NOT NULL,
+    physical_handicap boolean NOT NULL,
+    email character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    center integer NOT NULL,
+    stream integer NOT NULL,
+    school integer NOT NULL,
+    CONSTRAINT student_pkey PRIMARY KEY (enrollment_number),
+    CONSTRAINT student_center_fkey FOREIGN KEY (center)
+        REFERENCES public.centers (centerid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT student_school_fkey FOREIGN KEY (school)
+        REFERENCES public.school (schoolid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT student_stream_fkey FOREIGN KEY (stream)
+        REFERENCES public.stream (sid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+
+CREATE TABLE public.subject
+(
+    subjectid integer NOT NULL,
+    subject_name character varying(30) COLLATE pg_catalog."default",
+    streamid integer,
+    CONSTRAINT subject_pkey PRIMARY KEY (subjectid),
+    CONSTRAINT subject_streamid_fkey FOREIGN KEY (streamid)
+        REFERENCES public.stream (sid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+
+
